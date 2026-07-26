@@ -1,93 +1,85 @@
+"""
+===========================================
+Interview Report Module
+===========================================
+"""
+
 from config import (
-    PASS_MARK,
     CANDIDATE_NAME,
-    DOMAIN,
-    LEVEL
+    DOMAIN
 )
 
-def print_report(
-        question_list,
-        reference_answers,
-        candidate_answers,
-        scores
+
+def generate_report(
+    current_level,
+    question_list,
+    reference_answers,
+    candidate_answers,
+    scores,
+    average_score
 ):
 
     print("\n")
-
-    print("=" * 60)
-    print("QUESTION WISE EVALUATION")
-    print("=" * 60)
+    print("=" * 70)
+    print(f"LEVEL {current_level} REPORT")
+    print("=" * 70)
 
     for i in range(len(question_list)):
 
-        print("=" * 60)
+        print("=" * 70)
 
         print(f"Question {i+1}")
-
         print(question_list[i])
 
         print()
 
-        print("Reference Answer")
-
+        print("Reference Answer:")
         print(reference_answers[i])
 
         print()
 
-        print("Candidate Answer")
-
+        print("Candidate Answer:")
         print(candidate_answers[i])
 
         print()
 
         print(f"Score : {scores[i]} /10")
 
-    average_score = round(
-        sum(scores) / len(scores),
-        2
-    )
+        print("=" * 70)
 
-    print("\n")
-    print("=" * 60)
+    # -------------------------------
+    # Result
+    # -------------------------------
 
-    print("FINAL LEVEL SCORE")
-
-    print(f"{average_score} /10")
-
-    if average_score >= PASS_MARK:
+    if average_score >= 7:
 
         result = "PASS"
 
-        recommendation = "Proceed to LEVEL 2"
+        if current_level == 3:
+            recommendation = "Interview Completed Successfully"
+        else:
+            recommendation = f"Proceed to LEVEL {current_level+1}"
 
     else:
 
         result = "FAIL"
+        recommendation = f"Repeat LEVEL {current_level}"
 
-        recommendation = "Repeat LEVEL 1"
+    # -------------------------------
+    # Final Summary
+    # -------------------------------
 
-    print(result)
-    print(recommendation)
-
-    print("\n")
-    print("=" * 60)
-
+    print()
+    print("=" * 70)
     print("AI INTERVIEW REPORT")
-
-    print("=" * 60)
+    print("=" * 70)
 
     print(f"Candidate Name : {CANDIDATE_NAME}")
-
     print(f"Domain         : {DOMAIN}")
-
-    print(f"Current Level  : {LEVEL}")
-
+    print(f"Current Level  : Level {current_level}")
     print(f"Questions      : {len(question_list)}")
-
     print(f"Average Score  : {average_score} /10")
-
     print(f"Result         : {result}")
-
     print(f"Recommendation : {recommendation}")
 
-    print("=" * 60)
+    print("=" * 70)

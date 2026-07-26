@@ -1,201 +1,131 @@
-# 🤖 AI Interview Platform - Level 1 (Question Generation & Evaluation)
+# 🤖 AI Interview Platform - Level-Based Interview Engine
 
-## 📌 Project Overview
-
-This project is the **Level 1 module** of an AI-powered Interview Platform.
-
-The objective of this module is to conduct a **technical interview** by:
-
-* Generating interview questions using **Qwen 2.5-7B-Instruct**
-* Generating ideal reference answers
-* Accepting candidate responses
-* Evaluating candidate answers using semantic similarity (MiniLM)
-* Calculating the final interview score
-* Deciding whether the candidate is eligible to proceed to the next interview level
-
-This project is designed as a modular pipeline so it can be easily integrated into a larger AI Interview System.
+An AI-powered interview engine built using **Qwen 2.5 7B** for generating interview questions, reference answers, evaluating candidate responses, and automatically progressing through multiple interview levels.
 
 ---
 
-# 🎯 Current Features
+## 🚀 Features
 
-* ✅ Level 1 Question Generation
-* ✅ Reference Answer Generation
-* ✅ Candidate Answer Collection
-* ✅ Semantic Evaluation (MiniLM)
-* ✅ Question-wise Score
-* ✅ Final Level Score
-* ✅ PASS / FAIL Decision
-
----
-
-# 🧠 AI Models Used
-
-### Interview Question Generation
-
-* Qwen 2.5-7B-Instruct
-
-### Reference Answer Generation
-
-* Qwen 2.5-7B-Instruct
-
-### Semantic Evaluation
-
-* all-MiniLM-L6-v2
+- 🎯 Domain-specific interview generation
+- 📚 Level-based interview system
+- 🤖 Qwen 2.5 7B Question Generation
+- ✅ AI-generated Reference Answers
+- 📊 Semantic Evaluation using MiniLM
+- 📈 Automatic Score Calculation
+- 📄 Interview Report Generation
+- 🔄 Automatic Level Progression
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```
-AI_Interview_Level1/
+AI_Interview_System/
 
-│
-├── src/
-│   ├── model_loader.py
-│   ├── config.py
-│   ├── question_generation.py
-│   ├── reference_generation.py
-│   ├── evaluation.py
-│   ├── report.py
-│   └── main.py
-│
-├── notebook/
-│   └── AI_Interview_Level1.ipynb
-│
-├── outputs/
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
+│── main.py
+│── config.py
+│── model_loader.py
+│── interview_engine.py
+│── question_generation.py
+│── reference_generation.py
+│── evaluation.py
+│── report.py
+
+│── requirements.txt
+│── README.md
+│── .gitignore
 ```
 
 ---
 
-# ⚙️ Workflow
+## 📚 Interview Flow
 
 ```
-Start
-
-↓
-
-Load Qwen Model
-
-↓
-
-Generate Level 1 Questions
-
-↓
-
+Start Interview
+        │
+        ▼
+Level 1 - Fundamentals
+        │
+Generate Questions
+        │
 Generate Reference Answers
-
-↓
-
-Candidate Answers Questions
-
-↓
-
-MiniLM Semantic Evaluation
-
-↓
-
-Calculate Individual Scores
-
-↓
-
-Calculate Average Score
-
-↓
-
-PASS / FAIL
-
-↓
-
-Generate Final Report
+        │
+Candidate Answers
+        │
+MiniLM Evaluation
+        │
+Generate Report
+        │
+PASS?
+   ┌────┴────┐
+   │         │
+ YES         NO
+   │         │
+   ▼         ▼
+Level 2   Repeat Level
+   │
+   ▼
+Level 3
+   │
+   ▼
+Interview Completed
 ```
 
 ---
 
-# 📊 Evaluation Method
+## 🧠 Technologies Used
 
-Each candidate answer is compared with the reference answer using sentence embeddings.
+- Python 3.10+
+- Qwen 2.5 7B Instruct
+- Hugging Face Transformers
+- Sentence Transformers
+- MiniLM (all-MiniLM-L6-v2)
+- Scikit-Learn
+- PyTorch
 
-Pipeline:
+---
 
-```
-Reference Answer
-        │
-        ▼
-Sentence Embedding
-        │
-Candidate Answer
-        │
-        ▼
-Sentence Embedding
-        │
-        ▼
-Cosine Similarity
-        │
-        ▼
-Score (0–10)
+## ⚙️ Installation
+
+### Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/AI-Interview-System.git
+
+cd AI-Interview-System
 ```
 
 ---
 
-# 📈 Interview Report
+### Create Virtual Environment
 
-The generated report contains:
+Windows
 
-* Question
-* Reference Answer
-* Candidate Answer
-* Question Score
-* Final Average Score
-* PASS / FAIL Status
-* Recommendation
+```bash
+python -m venv venv
 
----
+venv\Scripts\activate
+```
 
-# 🚀 Future Enhancements
+Linux / Mac
 
-This module is part of a larger AI Interview Platform.
+```bash
+python3 -m venv venv
 
-Upcoming features include:
-
-* 🎤 Voice-to-Voice Interview
-* 🗣️ Speech-to-Text
-* 🔊 AI Voice Response
-* 😊 Emotion Detection
-* 👁️ Eye Contact Analysis
-* 📹 Webcam Monitoring
-* 🧠 Adaptive Question Generation
-* 📄 PDF Interview Report
-* 📊 Recruiter Dashboard
-* 🔗 RAG-based Knowledge Integration
+source venv/bin/activate
+```
 
 ---
 
-# 🛠️ Technologies Used
-
-* Python
-* PyTorch
-* Transformers
-* Hugging Face
-* Sentence Transformers
-* Scikit-learn
-* NumPy
-
----
-
-# ▶️ How to Run
-
-## Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Run
+---
+
+## ▶️ Run Project
 
 ```bash
 python main.py
@@ -203,17 +133,68 @@ python main.py
 
 ---
 
-# 👨‍💻 Author
+## 📋 Interview Levels
 
-**Prakash J**
+### Level 1
 
-AI Engineer
-
-AI Interview Platform Development
+- Fundamentals
+- Definitions
+- Basic Concepts
+- Real-world Examples
 
 ---
 
-# 📄 License
+### Level 2
 
-This project is intended for educational, research, and internship purposes.
-"# AI-Interview-Level1" 
+- Concept Application
+- Practical Scenarios
+- Comparisons
+- Usage-Based Questions
+
+---
+
+### Level 3
+
+- Problem Solving
+- Design Thinking
+- Optimization
+- Analytical Questions
+
+---
+
+## 📊 Evaluation
+
+Candidate answers are evaluated using:
+
+- MiniLM Sentence Embeddings
+- Cosine Similarity
+- Score out of 10
+
+Average score determines whether the candidate progresses to the next interview level.
+
+---
+
+## 📈 Future Enhancements
+
+- 🎤 Voice-to-Voice Interview
+- 🗣️ Speech-to-Text Integration
+- 🔊 Text-to-Speech Interviewer
+- 😊 Emotion Detection
+- 👀 Eye Contact Monitoring
+- 📹 Webcam Proctoring
+- 🧠 AI Technical Evaluation using Qwen
+- 📊 Skill-wise Scoring
+- ☁️ Database Integration
+- 🌐 Web Interface
+
+---
+
+## 👨‍💻 Developed By
+
+**Tech Jayam**
+
+AI Interview Platform
+
+Built using Qwen 2.5 7B and Hugging Face Transformers.
+
+---

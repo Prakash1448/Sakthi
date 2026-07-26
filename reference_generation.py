@@ -1,3 +1,9 @@
+"""
+===========================================
+Reference Answer Generation Module
+===========================================
+"""
+
 from model_loader import tokenizer, qwen_model
 from config import (
     ANSWER_TEMPERATURE,
@@ -13,7 +19,9 @@ def generate_reference_answers(question_list):
     print("Generating Reference Answers...")
     print("=" * 60)
 
-    for question in question_list:
+    for i, question in enumerate(question_list):
+
+        print(f"Generating Answer {i+1}/{len(question_list)}")
 
         prompt = f"""
 You are an experienced technical interviewer.
@@ -26,9 +34,10 @@ Question:
 Rules:
 
 - Answer should be technically correct.
-- Around 80-120 words.
-- Easy English.
+- Answer should be around 80-120 words.
+- Use simple English.
 - Suitable for freshers.
+- Explain clearly.
 - Return ONLY the answer.
 """
 
@@ -58,7 +67,8 @@ Rules:
         outputs = qwen_model.generate(
             **inputs,
             max_new_tokens=ANSWER_MAX_TOKENS,
-            temperature=ANSWER_TEMPERATURE
+            temperature=ANSWER_TEMPERATURE,
+            do_sample=True
         )
 
         generated_tokens = outputs[0][
@@ -68,10 +78,12 @@ Rules:
         answer = tokenizer.decode(
             generated_tokens,
             skip_special_tokens=True
-        )
+        ).strip()
 
         reference_answers.append(answer)
 
+    print()
     print("Reference Answers Generated Successfully.")
+    print("=" * 60)
 
     return reference_answers

@@ -1,81 +1,39 @@
-from question_generation import generate_questions
-from reference_generation import generate_reference_answers
-from evaluation import evaluate
-from report import print_report
+"""
+===========================================
+AI Interview Platform
+Qwen 2.5 7B
+Voice Interview Backend
+===========================================
+"""
+
+from interview_engine import start_interview
 
 
 def main():
 
-    print("=" * 60)
-    print("AI INTERVIEW PLATFORM")
-    print("=" * 60)
+    print("=" * 70)
+    print("        AI INTERVIEW PLATFORM")
+    print("=" * 70)
+    print()
 
-    # -----------------------------------------------------
-    # STEP 1 : Generate Questions
-    # -----------------------------------------------------
+    print("Domain : Data Structures and Algorithms")
+    print()
 
-    question_list = generate_questions()
+    print("Interview Flow")
+    print("----------------------------")
+    print("Level 1 -> Fundamentals")
+    print("Level 2 -> Application")
+    print("Level 3 -> Problem Solving")
+    print()
 
-    print("\nGenerated Questions\n")
+    input("Press ENTER to Start Interview...")
 
-    for i, question in enumerate(question_list):
+    start_interview()
 
-        print(f"{i+1}. {question}")
-
-    # -----------------------------------------------------
-    # STEP 2 : Generate Reference Answers
-    # -----------------------------------------------------
-
-    reference_answers = generate_reference_answers(
-        question_list
-    )
-
-    # -----------------------------------------------------
-    # STEP 3 : Candidate Interview
-    # -----------------------------------------------------
-
-    candidate_answers = []
-
-    print("\n")
-    print("=" * 60)
-    print("START INTERVIEW")
-    print("=" * 60)
-
-    for i, question in enumerate(question_list):
-
-        print("\n")
-
-        print("=" * 60)
-
-        print(f"Question {i+1}")
-
-        print(question)
-
-        print("=" * 60)
-
-        answer = input("Candidate Answer : ")
-
-        candidate_answers.append(answer)
-
-    # -----------------------------------------------------
-    # STEP 4 : Evaluate
-    # -----------------------------------------------------
-
-    scores = evaluate(
-        reference_answers,
-        candidate_answers
-    )
-
-    # -----------------------------------------------------
-    # STEP 5 : Generate Report
-    # -----------------------------------------------------
-
-    print_report(
-        question_list,
-        reference_answers,
-        candidate_answers,
-        scores
-    )
+    print()
+    print("=" * 70)
+    print("Interview Completed.")
+    print("=" * 70)
 
 
 if __name__ == "__main__":

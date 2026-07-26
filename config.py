@@ -1,12 +1,33 @@
+"""
+===========================================
+Configuration File
+===========================================
+"""
+
 # ==========================================================
-# Interview Configuration
+# Domain
 # ==========================================================
 
-# Interview Domain
 DOMAIN = "Data Structures and Algorithms"
 
-# Interview Level
-LEVEL = "Fundamentals"
+# ==========================================================
+# Interview Levels
+# ==========================================================
+
+LEVELS = {
+    1: {
+        "difficulty": "Fundamentals",
+        "pass_score": 7.0
+    },
+    2: {
+        "difficulty": "Application",
+        "pass_score": 7.0
+    },
+    3: {
+        "difficulty": "Problem Solving",
+        "pass_score": 7.0
+    }
+}
 
 # ==========================================================
 # Question Generation
@@ -29,7 +50,7 @@ ANSWER_MAX_TOKENS = 200
 PASS_MARK = 7.0
 
 # ==========================================================
-# Candidate
+# Candidate Details
 # ==========================================================
 
 CANDIDATE_NAME = "Demo Candidate"

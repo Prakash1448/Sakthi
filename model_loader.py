@@ -1,24 +1,37 @@
+"""
+===========================================
+Qwen 2.5 7B Model Loader
+===========================================
+"""
+
+import torch
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
-import torch
 
 # ==========================================================
-# Model Configuration
+# Model Name
 # ==========================================================
 
 MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
 
-print("=" * 60)
-print("Checking Qwen Model...")
-print("=" * 60)
+# ==========================================================
+# Load Tokenizer
+# ==========================================================
 
-print("Loading Tokenizer...")
+print("=" * 60)
+print("Loading Qwen Tokenizer...")
+print("=" * 60)
 
 tokenizer = AutoTokenizer.from_pretrained(
     MODEL_NAME
 )
 
+# ==========================================================
+# Load Model
+# ==========================================================
+
 print("Loading Qwen 2.5 7B Model...")
+print("This may take a few minutes...")
 
 qwen_model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
@@ -26,6 +39,10 @@ qwen_model = AutoModelForCausalLM.from_pretrained(
     device_map="auto"
 )
 
+# ==========================================================
+# Ready
+# ==========================================================
+
 print("=" * 60)
-print("Qwen Model Loaded Successfully")
+print("✅ Qwen 2.5 7B Loaded Successfully")
 print("=" * 60)
