@@ -1,92 +1,159 @@
 """
 ===========================================
 Evaluation Module
+AI Interview Platform
 ===========================================
 """
 
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
+from groq_client import client
 
-print("=" * 60)
-print("Loading MiniLM Embedding Model...")
-print("=" * 60)
-
-embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
+from config import (
+    MODEL_NAME,
+    EVALUATION_TEMPERATURE,
+    EVALUATION_MAX_TOKENS
 )
-
-print("MiniLM Loaded Successfully.")
-print()
 
 
 def evaluate_candidate(question_list, reference_answers):
-
-    candidate_answers = []
-    scores = []
 
     print("=" * 60)
     print("Candidate Interview Started")
     print("=" * 60)
 
-    # ---------------------------------------
-    # Candidate Answers
-    # ---------------------------------------
+    candidate_answers = []
+
+    scores = []
 
     for i, question in enumerate(question_list):
 
-        print()
+        print("\n")
         print("=" * 60)
         print(f"Question {i+1}")
         print("=" * 60)
+
         print(question)
+
         print()
 
-        answer = input("Candidate Answer : ")
+        candidate_answer = input("Candidate Answer : ")
 
-        candidate_answers.append(answer)
+        candidate_answers.append(candidate_answer)
 
-    print()
-    print("=" * 60)
-    print("Evaluating Answers...")
-    print("=" * 60)
+        prompt = f"""
+You are an expert technical interviewer.
 
-    # ---------------------------------------
-    # Semantic Evaluation
-    # ---------------------------------------
+Evaluate the candidate answer.
 
-    for ref, cand in zip(reference_answers, candidate_answers):
+Question:
+{question}
 
-        ref_embedding = embedding_model.encode(
-            [ref]
+Reference Answer:
+{reference_answers[i]}
+
+Candidate Answer:
+{candidate_answer}
+
+Instructions:
+
+Evaluate only based on technical correctness.
+
+Scoring Guide:
+
+10 = Perfect answer
+
+8-9 = Very Good
+
+6-7 = Good
+
+4-5 = Average
+
+0-3 = Poor
+
+Return ONLY the numeric score.
+
+Examples:
+
+8
+
+7.5
+
+9
+
+Do NOT explain.
+Do NOT write sentences.
+Return ONLY one number.
+"""
+
+        response = client.chat.completions.create(
+
+            model=MODEL_NAME,
+
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+
+            temperature=EVALUATION_TEMPERATURE,
+
+            max_tokens=EVALUATION_MAX_TOKENS
+
         )
 
-        cand_embedding = embedding_model.encode(
-            [cand]
-        )
+        result = response.choices[0].message.content.strip()
 
-        similarity = cosine_similarity(
-            ref_embedding,
-            cand_embedding
-        )[0][0]
+        try:
 
-        score = round(similarity * 10, 2)
+            score = float(result)
+
+        except:
+
+            try:
+
+                score = float(result.split()[0])
+
+            except:
+
+                score = 0.0
 
         scores.append(score)
 
-    # ---------------------------------------
-    # Average Score
-    # ---------------------------------------
+        print()
 
-    average_score = round(
-        sum(scores) / len(scores),
-        2
+        print(f"AI Score : {score}/10")
+
+    average_score = round(sum(scores) / len(scores), 2)
+
+    return average_score, candidate_answers, scores
+
+
+# ==========================================================
+# Testing
+# ==========================================================
+
+if __name__ == "__main__":
+
+    questions = [
+
+        "What is an Array?"
+
+    ]
+
+    reference_answers = [
+
+        "An array is a linear data structure that stores elements in contiguous memory."
+
+    ]
+
+    average_score, candidate_answers, scores = evaluate_candidate(
+
+        questions,
+
+        reference_answers
+
     )
 
-    print("Evaluation Completed Successfully.")
     print()
 
-    return (
-        average_score,
-        candidate_answers,
-        scores
-    )
+    print("Average Score :", average_score)

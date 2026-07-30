@@ -1,102 +1,82 @@
 """
 ===========================================
 Question Generation Module
+AI Interview Platform
 ===========================================
 """
 
-from model_loader import tokenizer, qwen_model
+from groq_client import client
+
 from config import (
     DOMAIN,
+    MODEL_NAME,
     QUESTION_TEMPERATURE,
     QUESTION_MAX_TOKENS
 )
 
 
-def generate_questions(level):
+def generate_questions(difficulty):
 
     print("=" * 60)
-    print(f"Generating {level} Questions...")
+    print("Generating Interview Questions...")
     print("=" * 60)
 
     prompt = f"""
-You are an experienced technical interviewer.
+You are an experienced Technical Interviewer.
 
-Generate exactly 10 interview questions.
+Generate EXACTLY 10 interview questions.
 
 Domain:
 {DOMAIN}
 
 Difficulty:
-{level}
+{difficulty}
 
 Rules:
 
-If Difficulty is Fundamentals:
-- Ask only beginner-level questions.
-- Focus on definitions.
-- Focus on concepts.
-- Ask simple real-world examples.
-- Do NOT ask coding questions.
-- Do NOT ask implementation questions.
+1. Return ONLY questions.
+2. Number each question.
+3. Do NOT generate answers.
+4. Do NOT generate explanations.
+5. Questions should be suitable for freshers.
+6. Questions must be unique.
+7. Questions should match the difficulty level.
 
-If Difficulty is Application:
-- Ask scenario-based questions.
-- Ask practical questions.
-- Ask comparison questions.
-- Do NOT ask coding problems.
+Difficulty Meaning:
 
-If Difficulty is Problem Solving:
-- Ask analytical questions.
-- Ask design-thinking questions.
-- Ask optimization ideas.
-- Still NO coding questions.
+Fundamentals:
+Definition, Basic Concepts, Examples
 
-Return ONLY the numbered questions.
+Application:
+Implementation, Comparison, Use Cases
 
-Example:
-
-1. What is a Stack?
-2. Explain Queue with an example.
+Problem Solving:
+Scenario Based, Coding Logic, Design Thinking
 """
 
-    messages = [
-        {
-            "role": "user",
-            "content": prompt
-        }
-    ]
+    response = client.chat.completions.create(
 
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
+        model=MODEL_NAME,
 
-    inputs = tokenizer(
-        text,
-        return_tensors="pt"
-    )
+        messages=[
 
-    inputs = {
-        k: v.to(next(qwen_model.parameters()).device)
-        for k, v in inputs.items()
-    }
+            {
 
-    outputs = qwen_model.generate(
-        **inputs,
-        max_new_tokens=QUESTION_MAX_TOKENS,
+                "role": "user",
+
+                "content": prompt
+
+            }
+
+        ],
+
         temperature=QUESTION_TEMPERATURE,
-        do_sample=True
+
+        max_tokens=QUESTION_MAX_TOKENS
+
     )
 
-    generated_tokens = outputs[0][
-        inputs["input_ids"].shape[1]:
-    ]
-
-    generated_text = tokenizer.decode(
-        generated_tokens,
-        skip_special_tokens=True
-    )
+    generated_text = response.choices[0].message.content.strip()
 
     question_list = []
 
@@ -107,13 +87,35 @@ Example:
         if not line:
             continue
 
-        if "." in line and line[0].isdigit():
+        if line[0].isdigit():
 
             question = line.split(".", 1)[1].strip()
 
             question_list.append(question)
 
-    print("Questions Generated Successfully.")
+    print()
+
+    print("Questions Generated Successfully")
+
     print()
 
     return question_list
+
+
+# ==========================================================
+# Testing
+# ==========================================================
+
+if __name__ == "__main__":
+
+    questions = generate_questions("Fundamentals")
+
+    print("=" * 60)
+
+    print("Generated Questions")
+
+    print("=" * 60)
+
+    for i, question in enumerate(questions, start=1):
+
+        print(f"{i}. {question}")
