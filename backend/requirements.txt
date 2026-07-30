@@ -9,3 +9,7 @@ numpy>=1.26.4
 huggingface-hub>=0.24.0
 safetensors>=0.4.3
 tqdm>=4.66.4
+groq
+python-dotenv
+fastapi
+uvicorn
