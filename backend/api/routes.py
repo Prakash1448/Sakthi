@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from interview_service import start_interview
 import json
+from submit_service import submit_interview
 
 from question_generation import generate_questions
 from reference_generation import generate_reference_answers
@@ -17,7 +18,13 @@ router = APIRouter()
 class QuestionRequest(BaseModel):
     difficulty: str
 
+class SubmitInterviewRequest(BaseModel):
 
+    questions: list[str]
+
+    reference_answers: list
+
+    candidate_answers: list[str]
 class ReferenceRequest(BaseModel):
     questions: list[str]
 
@@ -115,3 +122,22 @@ def evaluate_answer_api(request: EvaluationRequest):
         "evaluation": result
 
     }
+    
+    # -----------------------------------------
+# Submit Interview
+# -----------------------------------------
+
+@router.post("/submit-interview")
+def submit_interview_api(request: SubmitInterviewRequest):
+
+    result = submit_interview(
+
+        request.questions,
+
+        request.reference_answers,
+
+        request.candidate_answers
+
+    )
+
+    return result
