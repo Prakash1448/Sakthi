@@ -11,10 +11,11 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
 
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174"
-    ],
+   allow_origins=[
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://ai-interview-frontend-k3fe.onrender.com",
+],
 
     allow_credentials=True,
 
