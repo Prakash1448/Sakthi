@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Test - Web Audio API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .record-btn {
+            background: #dc2626;
+            color: white;
+        }
+        .stop-btn {
+            background: #f59e0b;
+            color: white;
+        }
+        .play-btn {
+            background: #10b981;
+            color: white;
+        }
+        #log {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <h1>🎤 Microphone Recording Test</h1>
+    <p>This tests the Web Audio API approach used in the interview platform.</p>
+    
+    <div>
+        <button id="recordBtn" class="record-btn">🎙️ Start Recording</button>
+        <button id="stopBtn" class="stop-btn" disabled>⏹️ Stop Recording</button>
+        <button id="playBtn" class="play-btn" disabled>▶️ Play Audio</button>
+    </div>
+    
+    <div>
+        <p id="status" style="font-size: 18px; margin: 20px 0;">Status: <span style="color: #64748b;">Ready</span></p>
+        <p id="timer" style="font-size: 16px; color: #f59e0b;">Duration: 0s</p>
+    </div>
+    
+    <div id="log"></div>
+
+    <script>
+        let audioContext = null;
+        let mediaStream = null;
+        let scriptProcessor = null;
+        let audioBuffers = [];
+        let audioBlob = null;
+        let recordingTimer = null;
+        let recordingDuration = 0;
+        
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const playBtn = document.getElementById('playBtn');
+        const statusEl = document.getElementById('status');
+        const timerEl = document.getElementById('timer');
+        const logEl = document.getElementById('log');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            logEl.innerHTML += `<span class="${colorClass}">[${timestamp}] ${message}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function setStatus(text, color) {
+            statusEl.innerHTML = `Status: <span style="color: ${color};">${text}</span>`;
+        }
+        
+        recordBtn.onclick = async () => {
+            try {
+                audioBuffers = [];
+                recordingDuration = 0;
+                
+                log('=== Starting Recording ===', 'info');
+                
+                // Get microphone
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 16000
+                    }
+                });
+                
+                log('✓ Microphone stream obtained', 'success');
+                
+                // Create AudioContext
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000
+                });
+                
+                log(`✓ AudioContext created (sample rate: ${audioContext.sampleRate} Hz)`, 'success');
+                
+                // Create source
+                const source = audioContext.createMediaStreamSource(mediaStream);
+                log('✓ Audio source created', 'success');
+                
+                // Create processor
+                const bufferSize = 4096;
+                scriptProcessor = audioContext.createScriptProcessor(bufferSize, 1, 1);
+                
+                scriptProcessor.onaudioprocess = (e) => {
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    const buffer = new Float32Array(inputData);
+                    audioBuffers.push(buffer);
+                    
+                    if (audioBuffers.length % 50 === 0) {
+                        log(`Captured ${audioBuffers.length} buffers (${audioBuffers.length * bufferSize} samples)`, 'info');
+                    }
+                };
+                
+                // Connect pipeline
+                source.connect(scriptProcessor);
+                scriptProcessor.connect(audioContext.destination);
+                
+                log('✓ Audio pipeline connected', 'success');
+                
+                // Start timer
+                recordingTimer = setInterval(() => {
+                    recordingDuration++;
+                    timerEl.textContent = `Duration: ${recordingDuration}s`;
+                }, 1000);
+                
+                recordBtn.disabled = true;
+                stopBtn.disabled = false;
+                playBtn.disabled = true;
+                setStatus('Recording...', '#ef4444');
+                
+                log('✓✓✓ RECORDING STARTED - SPEAK NOW! ✓✓✓', 'success');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                setStatus('Error', '#ef4444');
+            }
+        };
+        
+        stopBtn.onclick = async () => {
+            try {
+                log('=== Stopping Recording ===', 'info');
+                
+                // Stop timer
+                if (recordingTimer) {
+                    clearInterval(recordingTimer);
+                    recordingTimer = null;
+                }
+                
+                // Disconnect
+                if (scriptProcessor) {
+                    scriptProcessor.disconnect();
+                    scriptProcessor.onaudioprocess = null;
+                }
+                
+                // Stop stream
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    log(`✓ Stopped track: ${mediaStream.getTracks()[0].label}`, 'success');
+                }
+                
+                // Close context
+                if (audioContext) {
+                    await audioContext.close();
+                    log('✓ AudioContext closed', 'success');
+                }
+                
+                log(`✓ Total buffers captured: ${audioBuffers.length}`, 'success');
+                
+                if (audioBuffers.length === 0) {
+                    log('❌ No audio captured!', 'error');
+                    setStatus('Failed - No audio', '#ef4444');
+                    recordBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    return;
+                }
+                
+                // Convert to WAV
+                log('Converting to WAV...', 'info');
+                audioBlob = buffersToWav(audioBuffers, 16000);
+                
+                log(`✓✓✓ SUCCESS! Audio ready: ${audioBlob.size} bytes ✓✓✓`, 'success');
+                
+                recordBtn.disabled = false;
+                stopBtn.disabled = true;
+                playBtn.disabled = false;
+                setStatus('Ready to play', '#10b981');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        };
+        
+        playBtn.onclick = () => {
+            if (!audioBlob) {
+                log('❌ No audio to play', 'error');
+                return;
+            }
+            
+            log('Playing audio...', 'info');
+            const url = URL.createObjectURL(audioBlob);
+            const audio = new Audio(url);
+            audio.play();
+            
+            audio.onended = () => {
+                log('✓ Playback finished', 'success');
+                URL.revokeObjectURL(url);
+            };
+        };
+        
+        function buffersToWav(buffers, sampleRate) {
+            log('=== Converting to WAV ===', 'info');
+            
+            const totalLength = buffers.reduce((acc, buf) => acc + buf.length, 0);
+            log(`Total samples: ${totalLength}`, 'info');
+            
+            const mergedBuffer = new Float32Array(totalLength);
+            let offset = 0;
+            for (const buffer of buffers) {
+                mergedBuffer.set(buffer, offset);
+                offset += buffer.length;
+            }
+            
+            log('✓ Buffers merged', 'success');
+            
+            // Convert Float32 to Int16 PCM
+            const int16Buffer = new Int16Array(mergedBuffer.length);
+            for (let i = 0; i < mergedBuffer.length; i++) {
+                const sample = Math.max(-1, Math.min(1, mergedBuffer[i]));
+                int16Buffer[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+            }
+            
+            log('✓ Converted to Int16 PCM', 'success');
+            
+            // Create WAV file
+            const wavBuffer = new ArrayBuffer(44 + int16Buffer.length * 2);
+            const view = new DataView(wavBuffer);
+            
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + int16Buffer.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, int16Buffer.length * 2, true);
+            
+            const dataView = new Int16Array(wavBuffer, 44);
+            dataView.set(int16Buffer);
+            
+            log('✓ WAV file created', 'success');
+            log(`WAV size: ${wavBuffer.byteLength} bytes`, 'info');
+            
+            return new Blob([wavBuffer], { type: 'audio/wav' });
+        }
+        
+        log('Test page loaded. Click "Start Recording" to begin.', 'info');
+    </script>
+</body>
+</html>

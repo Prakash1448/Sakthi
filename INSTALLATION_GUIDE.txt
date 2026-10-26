@@ -1,0 +1,321 @@
+================================================================================
+AI INTERVIEW PLATFORM - COMPLETE INSTALLATION GUIDE
+================================================================================
+
+MAJOR FEATURES IMPLEMENTED:
+✓ MongoDB database for user tracking
+✓ PDF report generation (full & per-level)
+✓ Fixed webcam detection (no false warnings)
+✓ Three-level interview system
+
+================================================================================
+STEP 1: INSTALL MONGODB
+================================================================================
+
+Option A: MongoDB Community Server
+1. Download: https://www.mongodb.com/try/download/community
+2. Install with default settings
+3. MongoDB will run automatically as a Windows service
+
+Option B: MongoDB Compass (GUI Tool)
+1. Download: https://www.mongodb.com/try/download/compass
+2. Install and open
+3. Connect to: mongodb://localhost:27017
+
+VERIFY MongoDB is running:
+> mongo --version
+
+================================================================================
+STEP 2: INSTALL PYTHON DEPENDENCIES
+================================================================================
+
+cd backend
+pip install pymongo reportlab pillow
+
+Or install all:
+pip install -r requirements.txt
+
+================================================================================
+STEP 3: TEST DATABASE CONNECTION
+================================================================================
+
+cd backend
+python database.py
+
+EXPECTED OUTPUT:
+✅ MongoDB connected successfully
+   Database: ai_interview_platform
+✅ User created/retrieved: Test User
+✅ Session created: 65abc...
+
+IF FAILED:
+- Check MongoDB is running
+- Check connection string in database.py
+- Install pymongo: pip install pymongo
+
+================================================================================
+STEP 4: TEST PDF GENERATION
+================================================================================
+
+cd backend
+python pdf_report_generator.py
+
+EXPECTED OUTPUT:
+✅ PDF generated successfully: test_report.pdf
+
+IF FAILED:
+- Install reportlab: pip install reportlab pillow
+
+================================================================================
+STEP 5: TEST WEBCAM FIX
+================================================================================
+
+cd ..
+python test_webcam_strict.py
+
+EXPECTED OUTPUT:
+✅ TEST PASSED!
+   30 frames processed
+   0 warnings issued
+   Webcam is working correctly - no false warnings!
+
+================================================================================
+STEP 6: START THE APPLICATION
+================================================================================
+
+TERMINAL 1 - Backend:
+cd backend
+python main.py
+
+EXPECTED: "Uvicorn running on http://127.0.0.1:8000"
+
+TERMINAL 2 - Frontend:
+cd frontend
+npm run dev
+
+EXPECTED: "Local: http://localhost:5173"
+
+================================================================================
+STEP 7: TEST COMPLETE WORKFLOW
+================================================================================
+
+1. Open Browser: http://localhost:5173
+
+2. Start Interview:
+   - Enter username: "Test User"
+   - Select domain: "Python"
+   - Select level: "Level 1 - Basic Fundamentals"
+   - Click "Start Interview"
+
+3. Camera Setup:
+   - Allow camera access
+   - Verify "Face OK" indicator shows
+   - Verify warnings stay at 0/10
+
+4. Answer Questions:
+   - Answer each question
+   - Verify answers are evaluated
+   - Check score appears
+
+5. Complete Interview:
+   - Submit all answers
+   - Session should be marked complete
+
+6. Download Report:
+   - Backend: http://127.0.0.1:8000/reports/user/Test_User/pdf
+   - Should download PDF with full interview details
+
+================================================================================
+API ENDPOINTS (for testing)
+================================================================================
+
+Database Health:
+GET http://127.0.0.1:8000/database/health
+
+Start Interview with User Tracking:
+POST http://127.0.0.1:8000/interview/start-with-user
+{
+  "username": "John Doe",
+  "domain": "Python",
+  "level": "Level 1 - Basic Fundamentals"
+}
+
+Save Answer:
+POST http://127.0.0.1:8000/interview/save-answer
+{
+  "session_id": "your_session_id",
+  "question_index": 0,
+  "question": "What is a variable?",
+  "candidate_answer": "A variable stores data...",
+  "reference_answer": "Reference answer..."
+}
+
+Complete Interview:
+POST http://127.0.0.1:8000/interview/complete
+{
+  "session_id": "your_session_id",
+  "proctoring_session_id": "proctoring_id"
+}
+
+Download User Report:
+GET http://127.0.0.1:8000/reports/user/John_Doe/pdf
+
+Download Level Report:
+GET http://127.0.0.1:8000/reports/level/John_Doe/Level_1_-_Basic_Fundamentals/pdf
+
+================================================================================
+WEBCAM FIX DETAILS
+================================================================================
+
+PROBLEM: Warnings auto-incrementing with proper face detection
+
+SOLUTION APPLIED:
+1. Frontend (WebcamProctoring.jsx):
+   - More lenient face detection (skinToneRatio > 0.02)
+   - Only report violations with VERY high confidence (0.95)
+
+2. Backend (proctoring_service.py):
+   - Stricter confidence filter (must be ≥ 0.85)
+   - Only process very confident violations
+
+RESULT:
+✓ Normal face → No warnings
+✓ Minor movements → Ignored
+✓ Real violations (>1s) → Still detected correctly
+
+================================================================================
+DATABASE STRUCTURE
+================================================================================
+
+Collections:
+1. users - User information and statistics
+2. sessions - Interview sessions with Q&A
+3. answers - Detailed answer tracking
+4. proctoring_events - Violation logs
+
+View in MongoDB Compass:
+mongodb://localhost:27017/ai_interview_platform
+
+================================================================================
+PDF REPORTS
+================================================================================
+
+FULL USER REPORT:
+- Summary across all levels
+- Performance by level
+- Detailed Q&A for each level
+- Proctoring statistics
+- Recommendations
+
+LEVEL REPORT:
+- Single level details
+- All questions and answers
+- Evaluations and feedback
+- Works for incomplete sessions!
+
+Generated in: backend/reports/
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+MongoDB Connection Failed:
+> Check if MongoDB service is running
+> Reinstall MongoDB Community Server
+> Check connection string in database.py
+
+PDF Generation Error:
+> pip install reportlab pillow
+> Check write permissions in backend/reports/
+
+Webcam Auto-Increment:
+> Clear browser cache
+> Restart frontend: npm run dev
+> Check confidence values in browser console
+> Adjust thresholds in WebcamProctoring.jsx if needed
+
+Backend Won't Start:
+> Check all dependencies installed
+> Check port 8000 is not in use
+> Check .env file has GROQ_API_KEY
+
+Frontend Won't Start:
+> npm install (in frontend folder)
+> Check port 5173 is not in use
+
+================================================================================
+FILES CREATED/MODIFIED
+================================================================================
+
+NEW FILES:
+✓ backend/database.py - MongoDB service
+✓ backend/pdf_report_generator.py - PDF generation
+✓ backend/reports/ - PDF output folder
+✓ test_webcam_strict.py - Webcam testing
+✓ MONGODB_SETUP.md - Detailed setup guide
+✓ INSTALLATION_GUIDE.txt - This file
+
+MODIFIED FILES:
+✓ backend/requirements.txt - Added dependencies
+✓ backend/api/routes.py - New MongoDB endpoints
+✓ frontend/src/components/WebcamProctoring.jsx - Fixed detection
+✓ backend/proctoring_service.py - Higher confidence threshold
+
+================================================================================
+SUMMARY
+================================================================================
+
+✅ MongoDB Integration:
+   - Local database storage
+   - Per-user tracking
+   - Complete session history
+   - Proctoring event logging
+
+✅ PDF Report Generation:
+   - Full user reports (all levels)
+   - Level reports (even incomplete)
+   - Downloadable via API
+   - Detailed Q&A with scores
+
+✅ Webcam Detection Fixed:
+   - No false warnings
+   - Strict violation detection
+   - Only report when very confident
+   - Real violations still caught
+
+✅ Three-Level System:
+   - Level 1: Basic Fundamentals
+   - Level 2: Coding Logic
+   - Level 3: HR & AI Knowledge
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Install MongoDB
+2. Install Python dependencies
+3. Test database connection
+4. Test PDF generation
+5. Test webcam (no false warnings)
+6. Start backend and frontend
+7. Test complete interview flow
+8. Download and verify PDF reports
+
+All features are ready to use!
+
+================================================================================
+SUPPORT
+================================================================================
+
+Documentation:
+- MONGODB_SETUP.md - Complete MongoDB guide
+- CHANGES_SUMMARY.md - All changes documented
+- PROCTORING_FIX.md - Webcam fix details
+
+For issues:
+- Check error messages in backend terminal
+- Check browser console for frontend errors
+- Verify MongoDB is running
+- Check all dependencies installed
+
+================================================================================

@@ -9,9 +9,9 @@ function Home() {
 
     const [candidateName, setCandidateName] = useState("");
 
-    const [domain, setDomain] = useState("DSA");
+    const [domain, setDomain] = useState("Python Programming");
 
-    const [difficulty, setDifficulty] = useState("Fundamentals");
+    const [difficulty, setDifficulty] = useState("Level 1 - Basic Fundamentals");
     const [loading, setLoading] = useState(false);
     const startInterview = async () => {
 
@@ -29,7 +29,7 @@ function Home() {
 
         console.log(response.data);
 
-      navigate("/interview", {
+      navigate("/camera-setup", {
 
     state: response.data
 
@@ -98,7 +98,7 @@ function Home() {
 
                     <label className="text-gray-300">
 
-                        Domain
+                        Technical Domain
 
                     </label>
 
@@ -112,15 +112,35 @@ function Home() {
 
                     >
 
-                        <option>DSA</option>
+                        <option>Python Programming</option>
 
-                        <option>Java</option>
+                        <option>Data Structures & Algorithms (DSA)</option>
 
-                        <option>Python</option>
+                        <option>Machine Learning & AI</option>
 
-                        <option>React</option>
+                        <option>Web Development - Frontend</option>
 
-                        <option>AI/ML</option>
+                        <option>Web Development - Backend</option>
+
+                        <option>Full Stack Development</option>
+
+                        <option>React.js & Modern Frontend</option>
+
+                        <option>Node.js & Express</option>
+
+                        <option>Database & SQL</option>
+
+                        <option>Cloud Computing (AWS/Azure/GCP)</option>
+
+                        <option>DevOps & CI/CD</option>
+
+                        <option>Data Science & Analytics</option>
+
+                        <option>Cybersecurity</option>
+
+                        <option>Mobile App Development</option>
+
+                        <option>RAG (Retrieval Augmented Generation) & LLM Applications</option>
 
                     </select>
 
@@ -128,9 +148,9 @@ function Home() {
 
                 <div className="mt-6">
 
-                    <label className="text-gray-300">
+                    <label className="text-gray-300 block mb-2">
 
-                        Difficulty
+                        Interview Level
 
                     </label>
 
@@ -144,13 +164,40 @@ function Home() {
 
                     >
 
-                        <option>Fundamentals</option>
+                        <option value="Level 1 - Basic Fundamentals">
+                            Level 1 - Basic Fundamentals (What is...? Definitions)
+                        </option>
 
-                        <option>Application</option>
+                        <option value="Level 2 - Coding Logic">
+                            Level 2 - Coding Logic (Explain approach, no code)
+                        </option>
 
-                        <option>Problem Solving</option>
+                        <option value="Level 3 - HR & AI Knowledge">
+                            Level 3 - HR & AI Knowledge (Behavioral + AI Tools)
+                        </option>
 
                     </select>
+                    
+                    <div className="mt-3 p-3 bg-slate-800 rounded-lg text-sm text-gray-400">
+                        {difficulty === "Level 1 - Basic Fundamentals" && (
+                            <div>
+                                <strong className="text-blue-400">Level 1:</strong> Tests basic knowledge, 
+                                definitions, and fundamental concepts. No coding required.
+                            </div>
+                        )}
+                        {difficulty === "Level 2 - Coding Logic" && (
+                            <div>
+                                <strong className="text-yellow-400">Level 2:</strong> Explain your logic 
+                                and approach to solve problems. No actual code writing needed.
+                            </div>
+                        )}
+                        {difficulty === "Level 3 - HR & AI Knowledge" && (
+                            <div>
+                                <strong className="text-green-400">Level 3:</strong> HR behavioral questions 
+                                + Modern AI tools usage (ChatGPT, Copilot, etc.)
+                            </div>
+                        )}
+                    </div>
 
                 </div>
 
@@ -176,6 +223,19 @@ loading ?
 
 </button>
 
+                <button
+                    onClick={() => {
+                        if (candidateName.trim()) {
+                            navigate('/dashboard', { state: { username: candidateName } });
+                        } else {
+                            alert("Please enter your name first");
+                        }
+                    }}
+                    className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-lg text-lg font-semibold transition"
+                >
+                    📊 View Dashboard
+                </button>
+
             </div>
 
         </div>
@@ -185,3 +245,5 @@ loading ?
 }
 
 export default Home;
+
+// Dashboard button - View user performance and history

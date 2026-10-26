@@ -15,17 +15,38 @@ CANDIDATE_NAME = "Demo Candidate"
 # Interview Domain
 # ==========================================================
 
-DOMAIN = "Data Structures and Algorithms"
+# Available domains - 15 comprehensive options
+AVAILABLE_DOMAINS = [
+    "Python Programming",
+    "Data Structures & Algorithms (DSA)",
+    "Machine Learning & AI",
+    "Web Development - Frontend",
+    "Web Development - Backend",
+    "Full Stack Development",
+    "React.js & Modern Frontend",
+    "Node.js & Express",
+    "Database & SQL",
+    "Cloud Computing (AWS/Azure/GCP)",
+    "DevOps & CI/CD",
+    "Data Science & Analytics",
+    "Cybersecurity",
+    "Mobile App Development",
+    "RAG (Retrieval Augmented Generation) & LLM Applications"
+]
+
+DOMAIN = "Python Programming"  # Default domain
 
 # ==========================================================
 # Groq Model
 # ==========================================================
 
-# Recommended Models:
-# "llama-3.3-70b-versatile"
-# "llama-3.1-8b-instant"
+# Recommended Models (Free Tier Available):
+# "openai/gpt-oss-20b" - Fast, free tier available
+# "openai/gpt-oss-120b" - Slower but more capable
+# "llama-3.3-70b-versatile" - Enterprise only
+# "llama-3.1-8b-instant" - Enterprise only (no longer free)
 
-MODEL_NAME = "llama-3.1-8b-instant"
+MODEL_NAME = "openai/gpt-oss-20b"
 
 # ==========================================================
 # Interview Levels

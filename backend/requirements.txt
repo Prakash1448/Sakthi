@@ -1,11 +1,9 @@
 torch>=2.2.0
 transformers>=4.45.0
 accelerate>=0.34.0
-
 sentence-transformers>=3.0.1
 scikit-learn>=1.5.0
 numpy>=1.26.4
-
 huggingface-hub>=0.24.0
 safetensors>=0.4.3
 tqdm>=4.66.4
@@ -13,3 +11,13 @@ groq
 python-dotenv
 fastapi
 uvicorn
+python-multipart
+pymongo
+reportlab
+pillow
+matplotlib
+scipy
+matplotlib
+scipy
+matplotlib
+scipy

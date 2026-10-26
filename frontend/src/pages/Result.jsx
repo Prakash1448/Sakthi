@@ -211,6 +211,13 @@ function Result() {
                     Start New Interview
 
                 </button>
+                
+                <button
+                    onClick={() => navigate("/dashboard")}
+                    className="w-full mt-4 bg-purple-500 hover:bg-purple-600 py-4 rounded-xl text-white text-xl font-semibold"
+                >
+                    📊 View Dashboard
+                </button>
 
             </div>
 
