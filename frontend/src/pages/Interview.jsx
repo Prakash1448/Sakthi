@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import api from "../services/api";
 import { FaMicrophone, FaStop, FaRedo, FaCheck } from "react-icons/fa";
 import WebcamProctoring from "../components/WebcamProctoring";
+import CodeEditor from "../components/CodeEditor";
 
 function Interview() {
 
@@ -24,13 +25,17 @@ function Interview() {
         );
 
     }
+    
+    // Check if this is Level 2 (Coding Logic)
+    const isLevel2 = interview.difficulty === "Level 2 - Coding Logic";
+    const codingProblems = isLevel2 ? interview.questions : null;
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
 
     const [answers, setAnswers] = useState(
-
-        Array(interview.questions.length).fill("")
-
+        isLevel2 
+            ? Array(codingProblems.length).fill(null)  // For code submissions
+            : Array(interview.questions.length).fill("")  // For text answers
     );
 
     const [loading, setLoading] = useState(false);
@@ -92,6 +97,27 @@ function Interview() {
 
         setAnswers(temp);
 
+    };
+    
+    const handleCodeSubmit = (codeSubmission) => {
+        // Store code, language, and execution result
+        const temp = [...answers];
+        temp[currentQuestion] = {
+            code: codeSubmission.code,
+            language: codeSubmission.language,
+            result: codeSubmission.result,
+            problem_title: codingProblems[currentQuestion].title
+        };
+        setAnswers(temp);
+        
+        // Auto-advance to next problem
+        if (currentQuestion < codingProblems.length - 1) {
+            nextQuestion();
+        } else {
+            // All problems completed
+            alert("All coding problems completed! Submitting interview...");
+            submitInterview();
+        }
     };
 
     const nextQuestion = () => {
@@ -489,7 +515,30 @@ function Interview() {
             </div>
         );
     }
+    
+    // Level 2: Show Code Editor
+    if (isLevel2) {
+        return (
+            <div className="min-h-screen bg-slate-950">
+                {/* Webcam Proctoring Component */}
+                {proctoringSessionId && (
+                    <WebcamProctoring
+                        sessionId={proctoringSessionId}
+                        onTerminate={handleProctoringTermination}
+                    />
+                )}
+                
+                <CodeEditor
+                    problem={codingProblems[currentQuestion]}
+                    onSubmit={handleCodeSubmit}
+                    problemIndex={currentQuestion}
+                    totalProblems={codingProblems.length}
+                />
+            </div>
+        );
+    }
 
+    // Level 1 & 3: Regular text-based interview
     return (
 
         <div className="min-h-screen bg-slate-950 flex justify-center items-center">

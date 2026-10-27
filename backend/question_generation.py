@@ -68,46 +68,69 @@ Rules:
 """
     
     elif difficulty == "Level 2 - Coding Logic":
+        # For Level 2, generate ACTUAL CODING PROBLEMS instead of logic questions
         prompt = f"""
-You are an experienced Technical Interviewer conducting a LEVEL 2 Coding Logic Interview.
+You are an expert coding interview problem creator.
 
-Generate EXACTLY 10 coding logic questions.
+Generate EXACTLY 5 coding problems for domain: {selected_domain}
 
-Domain:
-{selected_domain}
+Each problem MUST include:
+1. Clear title
+2. Problem description
+3. Input/output format specification
+4. 3-4 test cases with input and expected output
 
-LEVEL 2 FOCUS:
-- Logic explanation (NOT writing actual code)
-- Algorithm approach questions
-- Problem-solving strategy
-- "How would you..." type questions
-- Explain the logic/approach
-- Pseudocode thinking
-- Questions MUST be specifically about {selected_domain}
+Return as JSON array:
+[
+  {{
+    "title": "Problem Title",
+    "description": "Clear problem statement with requirements",
+    "difficulty": "Easy or Medium",
+    "input_format": "Description of input format",
+    "output_format": "Description of expected output",
+    "examples": [
+      {{
+        "input": "sample input",
+        "output": "expected output",
+        "explanation": "why this output"
+      }}
+    ],
+    "test_cases": [
+      {{"input": "test input 1", "expected_output": "output 1"}},
+      {{"input": "test input 2", "expected_output": "output 2"}},
+      {{"input": "test input 3", "expected_output": "output 3"}}
+    ],
+    "hints": ["hint 1", "hint 2"]
+  }}
+]
 
-Examples for Python:
-- How would you find the largest number in a list? Explain the logic.
-- What approach would you use to remove duplicates from a list?
-- Explain the logic to reverse a string without using built-in functions.
+Requirements:
+- Problems MUST be specific to {selected_domain}
+- Include clear input/output specifications
+- Test cases must be complete and correct
+- Start with easier problems, progress to medium difficulty
+- Return ONLY valid JSON, no markdown or extra text
 
-Examples for React.js:
-- How would you handle form validation in React? Explain the approach.
-- What approach would you use to optimize a React component that re-renders frequently?
-- Explain the logic for implementing infinite scroll in React.
+Domain-Specific Guidelines:
 
-Examples for Database & SQL:
-- How would you optimize a slow database query? Explain the approach.
-- What strategy would you use to prevent SQL injection attacks?
-- Explain the logic for designing a normalized database schema.
+For Python/DSA:
+- Array manipulation
+- String processing  
+- Basic algorithms (sorting, searching)
+- Data structure problems (lists, dictionaries)
 
-Rules:
-1. Return ONLY questions.
-2. Number each question (1-10).
-3. Do NOT generate answers.
-4. Questions ask for LOGIC/APPROACH about {selected_domain}, not actual code.
-5. Focus on problem-solving methodology in {selected_domain}.
-6. Candidate should explain their thinking process.
-7. No need to write syntactically correct code.
+For Web Development:
+- DOM manipulation problems
+- Data transformation
+- API response processing
+- Form validation logic
+
+For Database/SQL:
+- Query writing problems
+- Data transformation
+- Schema design challenges
+
+Return ONLY the JSON array, nothing else.
 """
     
     else:  # Level 3 - HR & AI Knowledge
@@ -190,6 +213,30 @@ Rules:
 
     generated_text = response.choices[0].message.content.strip()
 
+    # For Level 2, return JSON coding problems
+    if difficulty == "Level 2 - Coding Logic":
+        try:
+            # Extract JSON from response
+            if "```json" in generated_text:
+                generated_text = generated_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in generated_text:
+                generated_text = generated_text.split("```")[1].split("```")[0].strip()
+            
+            import json
+            problems = json.loads(generated_text)
+            
+            print()
+            print(f"✅ Generated {len(problems)} Coding Problems Successfully")
+            print()
+            
+            return problems  # Return as JSON for Level 2
+        except Exception as e:
+            print(f"⚠️  Error parsing JSON, falling back to fallback problems: {e}")
+            # Import fallback function
+            from code_execution_service import get_fallback_problems
+            return get_fallback_problems(selected_domain)
+    
+    # For Level 1 and 3, parse as regular questions
     question_list = []
 
     for line in generated_text.split("\n"):

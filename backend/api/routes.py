@@ -18,6 +18,7 @@ from proctoring_service import (
     handle_camera_event,
     terminate_session
 )
+from code_execution_service import CodeExecutor
 
 # MongoDB integration (optional - won't break if MongoDB not installed)
 try:
@@ -42,11 +43,11 @@ class QuestionRequest(BaseModel):
 
 class SubmitInterviewRequest(BaseModel):
 
-    questions: list[str]
+    questions: list  # Can be list[str] for Level 1/3 or list[dict] for Level 2
 
     reference_answers: list
 
-    candidate_answers: list[str]
+    candidate_answers: list  # Can be list[str] for Level 1/3 or list[dict] for Level 2
 class ReferenceRequest(BaseModel):
     questions: list[str]
 
@@ -95,6 +96,12 @@ class TabSwitchRequest(BaseModel):
 class CameraEventRequest(BaseModel):
     session_id: str
     event_type: str  # "disconnect" or "reconnect"
+
+class CodeExecutionRequest(BaseModel):
+    code: str
+    language: str
+    test_cases: list = []
+    timeout: int = 5
 # -------------------------
 # Health API
 # -------------------------
@@ -273,6 +280,51 @@ async def transcribe_audio_api(audio: UploadFile = File(...)):
         return {
             "success": False,
             "error": f"Failed to process audio: {str(e)}"
+        }
+
+
+# -----------------------------------------
+# Code Execution (Level 2)
+# -----------------------------------------
+
+@router.post("/execute-code")
+def execute_code_api(request: CodeExecutionRequest):
+    """
+    Execute code with test cases for Level 2 coding problems.
+    
+    Supports: Python, JavaScript, Java, C, C++
+    Returns: Execution results with test case outcomes
+    """
+    try:
+        print("=" * 60)
+        print("Code Execution Request")
+        print(f"Language: {request.language}")
+        print(f"Code length: {len(request.code)} characters")
+        print(f"Test cases: {len(request.test_cases)}")
+        print("=" * 60)
+        
+        executor = CodeExecutor()
+        
+        result = executor.execute_code(
+            code=request.code,
+            language=request.language,
+            test_cases=request.test_cases if request.test_cases else None,
+            timeout=request.timeout
+        )
+        
+        print(f"\n{'✅' if result['success'] else '❌'} Execution Result: {result.get('output', '')}")
+        
+        return result
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {
+            "success": False,
+            "error": f"Server error: {str(e)}",
+            "output": "",
+            "execution_time": 0,
+            "test_results": []
         }
 
 

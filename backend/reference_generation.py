@@ -14,6 +14,14 @@ from config import (
 
 
 def generate_reference_answers(question_list):
+    """
+    Generate reference answers for questions.
+    
+    For Level 2 (coding problems), returns dummy references since
+    evaluation is based on test cases, not reference comparison.
+    
+    For Level 1 & 3, generates LLM-based reference answers.
+    """
 
     reference_answers = []
 
@@ -22,7 +30,20 @@ def generate_reference_answers(question_list):
     print("=" * 60)
 
     for question in question_list:
+        
+        # Check if this is a Level 2 coding problem (dict with 'title' key)
+        if isinstance(question, dict) and 'title' in question:
+            # For coding problems, store the problem itself as reference
+            # Evaluation will use test_cases from the problem, not this reference
+            reference_answers.append({
+                "question": question.get('title', 'Coding Problem'),
+                "reference_answer": f"This is a coding problem. Solution evaluated by test cases.",
+                "is_coding_problem": True,
+                "problem": question  # Store full problem for later use
+            })
+            continue
 
+        # For text-based questions (Level 1 & 3)
         prompt = f"""
 You are an expert technical interviewer.
 
@@ -64,7 +85,9 @@ Rules:
 
             "question": question,
 
-            "reference_answer": answer
+            "reference_answer": answer,
+            
+            "is_coding_problem": False
 
         })
 
